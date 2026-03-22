@@ -3,41 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Time</title>
+<title>Time Pro</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background: linear-gradient(135deg, #000000, #1a0000, #330000);
     color: white;
     text-align: center;
 }
 
-/* Smooth Animation */
-body {
-    animation: fadeIn 1.5s ease-in-out;
+/* Glow Effekt */
+.glow {
+    text-shadow: 0 0 10px red, 0 0 20px red;
 }
 
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+/* Layout */
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    flex-wrap: wrap;
 }
 
 /* Digital Clock */
-#clock {
+.digital {
     font-size: 70px;
-    margin-top: 30px;
 }
 
 /* Analog Clock */
 .clock {
-    width: 220px;
-    height: 220px;
-    border: 6px solid white;
+    width: 180px;
+    height: 180px;
+    border: 5px solid red;
     border-radius: 50%;
-    margin: 30px auto;
     position: relative;
+    box-shadow: 0 0 20px red;
 }
 
 .hand {
@@ -47,24 +50,24 @@ body {
     background: white;
 }
 
-.hour { width: 35%; height: 4px; }
+.hour { width: 30%; height: 4px; }
 .minute { width: 45%; height: 3px; }
 .second { width: 50%; height: 2px; background: red; }
 
 /* Sections */
 .section {
-    margin-top: 40px;
+    padding: 80px 20px;
 }
 
 /* Buttons */
 button {
-    margin: 10px;
     padding: 10px 20px;
-    border-radius: 20px;
     border: none;
-    background: white;
+    border-radius: 20px;
+    background: red;
+    color: white;
     cursor: pointer;
-    transition: 0.3s;
+    box-shadow: 0 0 10px red;
 }
 
 button:hover {
@@ -82,123 +85,156 @@ input, select {
 
 <body>
 
-<h1>TIME</h1>
+<!-- TOP CLOCK -->
+<div class="section">
+<h1 class="glow">TIME</h1>
 
-<!-- Digital Clock -->
-<div id="clock"></div>
+<div class="row">
+    <div class="digital glow" id="clock"></div>
 
-<!-- Analog Clock -->
-<div class="clock">
-    <div class="hand hour" id="hour"></div>
-    <div class="hand minute" id="minute"></div>
-    <div class="hand second" id="second"></div>
+    <div class="clock">
+        <div class="hand hour" id="hour"></div>
+        <div class="hand minute" id="minute"></div>
+        <div class="hand second" id="second"></div>
+    </div>
+</div>
 </div>
 
-<!-- World Time -->
+<!-- WORLD TIME -->
 <div class="section">
-<h2>Weltzeit</h2>
+<h2 class="glow">WELTZEIT</h2>
 
 <select id="timezone">
     <option value="Europe/Berlin">Deutschland 🇩🇪</option>
     <option value="America/New_York">New York 🇺🇸</option>
-    <option value="Europe/London">London 🇬🇧</option>
     <option value="Asia/Tokyo">Tokyo 🇯🇵</option>
-    <option value="Australia/Sydney">Sydney 🇦🇺</option>
+    <option value="Europe/London">London 🇬🇧</option>
 </select>
 
-<div id="world" style="font-size:30px; margin-top:10px;"></div>
+<div class="row">
+    <div class="digital glow" id="worldDigital"></div>
+
+    <div class="clock">
+        <div class="hand hour" id="whour"></div>
+        <div class="hand minute" id="wminute"></div>
+        <div class="hand second" id="wsecond"></div>
+    </div>
+</div>
 </div>
 
-<!-- Timer -->
+<!-- TIMER -->
 <div class="section">
-<h2>Timer</h2>
+<h2 class="glow">TIMER</h2>
+
 <input type="number" id="minutes" placeholder="Minuten">
 <button onclick="startTimer()">Start</button>
-<div id="timer"></div>
+<button onclick="stopSound()">Stop Sound</button>
+
+<div class="row">
+    <div class="digital glow" id="timer">0:00</div>
+
+    <div class="clock">
+        <div class="hand hour" id="thour"></div>
+        <div class="hand minute" id="tminute"></div>
+        <div class="hand second" id="tsecond"></div>
+    </div>
+</div>
 </div>
 
-<!-- Stopwatch -->
+<!-- STOPWATCH -->
 <div class="section">
-<h2>Stoppuhr</h2>
-<div id="stopwatch">0.0</div>
+<h2 class="glow">STOPPUHR</h2>
+
+<div class="digital glow" id="stopwatch">0.0</div>
+
 <button onclick="startStopwatch()">Start</button>
 <button onclick="stopStopwatch()">Stop</button>
 <button onclick="resetStopwatch()">Reset</button>
 </div>
 
+<audio id="alarm">
+<source src="https://www.soundjay.com/buttons/beep-07.wav" type="audio/wav">
+</audio>
+
 <script>
-// Digital Clock
+// MAIN CLOCK
 function updateClock() {
     let now = new Date();
     document.getElementById("clock").innerText = now.toLocaleTimeString("de-DE");
-}
-setInterval(updateClock, 1000);
 
-// Analog Clock
-function updateAnalog() {
-    let now = new Date();
-    let sec = now.getSeconds() * 6;
-    let min = now.getMinutes() * 6;
-    let hr = now.getHours() * 30;
+    let sec = now.getSeconds()*6;
+    let min = now.getMinutes()*6;
+    let hr = now.getHours()*30;
 
     document.getElementById("second").style.transform = `rotate(${sec}deg)`;
     document.getElementById("minute").style.transform = `rotate(${min}deg)`;
     document.getElementById("hour").style.transform = `rotate(${hr}deg)`;
 }
-setInterval(updateAnalog, 1000);
+setInterval(updateClock,1000);
 
-// World Time with selection
+// WORLD CLOCK
 function updateWorld() {
-    let now = new Date();
     let zone = document.getElementById("timezone").value;
+    let now = new Date();
 
-    let time = now.toLocaleTimeString("de-DE", { timeZone: zone });
+    let time = now.toLocaleTimeString("de-DE",{timeZone:zone});
+    document.getElementById("worldDigital").innerText = time;
 
-    document.getElementById("world").innerText = time;
+    let sec = now.getSeconds()*6;
+    let min = now.getMinutes()*6;
+    let hr = now.getHours()*30;
+
+    document.getElementById("wsecond").style.transform = `rotate(${sec}deg)`;
+    document.getElementById("wminute").style.transform = `rotate(${min}deg)`;
+    document.getElementById("whour").style.transform = `rotate(${hr}deg)`;
 }
-setInterval(updateWorld, 1000);
+setInterval(updateWorld,1000);
 
-// Timer
-function startTimer() {
-    let min = document.getElementById("minutes").value;
-    let time = min * 60;
+// TIMER
+let timerInterval;
+function startTimer(){
+    let time = document.getElementById("minutes").value*60;
 
-    let interval = setInterval(() => {
-        let m = Math.floor(time / 60);
-        let s = time % 60;
-        document.getElementById("timer").innerText = m + ":" + (s < 10 ? "0"+s : s);
+    timerInterval = setInterval(()=>{
+        let m=Math.floor(time/60);
+        let s=time%60;
+        document.getElementById("timer").innerText=m+":"+(s<10?"0"+s:s);
 
         time--;
-        if (time < 0) {
-            clearInterval(interval);
-            alert("Fertig!");
+        if(time<0){
+            clearInterval(timerInterval);
+            document.getElementById("alarm").play();
         }
-    }, 1000);
+    },1000);
 }
 
-// Stopwatch
-let sw = 0;
-let running = false;
-let interval;
+function stopSound(){
+    let audio=document.getElementById("alarm");
+    audio.pause();
+    audio.currentTime=0;
+}
 
-function startStopwatch() {
-    if (!running) {
-        running = true;
-        interval = setInterval(() => {
-            sw += 0.1;
-            document.getElementById("stopwatch").innerText = sw.toFixed(1);
-        }, 100);
+// STOPWATCH
+let sw=0, running=false, swInterval;
+
+function startStopwatch(){
+    if(!running){
+        running=true;
+        swInterval=setInterval(()=>{
+            sw+=0.1;
+            document.getElementById("stopwatch").innerText=sw.toFixed(1);
+        },100);
     }
 }
 
-function stopStopwatch() {
-    running = false;
-    clearInterval(interval);
+function stopStopwatch(){
+    running=false;
+    clearInterval(swInterval);
 }
 
-function resetStopwatch() {
-    sw = 0;
-    document.getElementById("stopwatch").innerText = "0.0";
+function resetStopwatch(){
+    sw=0;
+    document.getElementById("stopwatch").innerText="0.0";
 }
 </script>
 
