@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Time X</title>
+<title>TIME</title>
 
 <style>
 body {
@@ -14,7 +14,7 @@ body {
     text-align:center;
 }
 
-/* 3D Glas Effekt */
+/* 3D Karte */
 .card {
     margin:40px auto;
     padding:30px;
@@ -25,12 +25,6 @@ body {
     box-shadow: 0 0 40px rgba(255,0,0,0.4);
 }
 
-/* Digital */
-.digital {
-    font-size:60px;
-    text-shadow:0 0 20px red;
-}
-
 /* Layout */
 .row {
     display:flex;
@@ -38,6 +32,12 @@ body {
     align-items:center;
     gap:40px;
     flex-wrap:wrap;
+}
+
+/* Digital */
+.digital {
+    font-size:60px;
+    text-shadow:0 0 20px red;
 }
 
 /* ANALOG CLOCK */
@@ -64,24 +64,27 @@ body {
     transform: rotate(calc(-30deg * var(--n)));
 }
 
-/* Zeiger */
+/* Zeiger FIXED */
 .hand {
     position:absolute;
-    top:50%;
+    bottom:50%;
     left:50%;
-    transform-origin: bottom;
+    transform-origin: bottom center;
+    transform: translateX(-50%);
 }
 
 .hour {
     width:6px;
     height:50px;
     background:white;
+    border-radius:3px;
 }
 
 .minute {
     width:4px;
     height:70px;
     background:white;
+    border-radius:3px;
 }
 
 .second {
@@ -117,13 +120,12 @@ input, select {
 
 <body>
 
-<h1 style="text-shadow:0 0 20px red;">TIME X</h1>
+<h1 style="text-shadow:0 0 20px red;">TIME</h1>
 
 <!-- MAIN -->
 <div class="card">
 <div class="row">
 <div class="digital" id="clock"></div>
-
 <div class="clock" id="mainClock"></div>
 </div>
 </div>
@@ -167,13 +169,13 @@ input, select {
 <button onclick="resetSW()">Reset</button>
 </div>
 
-<audio id="alarm">
-<source src="https://www.soundjay.com/buttons/beep-07.wav">
+<audio id="alarm" preload="auto">
+<source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
 </audio>
 
 <script>
 
-/* ZAHLEN ERZEUGEN */
+/* ZAHLEN */
 function createNumbers(clock){
     for(let i=1;i<=12;i++){
         let div=document.createElement("div");
@@ -200,43 +202,47 @@ function createHands(clock){
     return {h,m,s};
 }
 
-/* CLOCKS */
-let main=createHands(document.getElementById("mainClock"));
-createNumbers(document.getElementById("mainClock"));
+/* CLOCK SETUP */
+let mainClock=document.getElementById("mainClock");
+let worldClock=document.getElementById("worldClock");
 
-let world=createHands(document.getElementById("worldClock"));
-createNumbers(document.getElementById("worldClock"));
+createNumbers(mainClock);
+createNumbers(worldClock);
+
+let main=createHands(mainClock);
+let world=createHands(worldClock);
 
 /* UPDATE */
 function update(){
     let now=new Date();
 
-    // digital
+    // Digital Haupt
     document.getElementById("clock").innerText=now.toLocaleTimeString("de-DE");
 
-    // analog main
+    // Analog Haupt
     let sec=now.getSeconds()*6;
     let min=now.getMinutes()*6;
     let hr=now.getHours()*30;
 
-    main.s.style.transform=`rotate(${sec}deg) translate(-50%, -100%)`;
-    main.m.style.transform=`rotate(${min}deg) translate(-50%, -100%)`;
-    main.h.style.transform=`rotate(${hr}deg) translate(-50%, -100%)`;
+    main.s.style.transform=`translateX(-50%) rotate(${sec}deg)`;
+    main.m.style.transform=`translateX(-50%) rotate(${min}deg)`;
+    main.h.style.transform=`translateX(-50%) rotate(${hr}deg)`;
 
-    // world
+    // Weltzeit
     let zone=document.getElementById("timezone").value;
-    let time=now.toLocaleTimeString("de-DE",{timeZone:zone});
-    document.getElementById("world").innerText=time;
+    let wtime=now.toLocaleTimeString("de-DE",{timeZone:zone});
+    document.getElementById("world").innerText=wtime;
 
-    world.s.style.transform=`rotate(${sec}deg) translate(-50%, -100%)`;
-    world.m.style.transform=`rotate(${min}deg) translate(-50%, -100%)`;
-    world.h.style.transform=`rotate(${hr}deg) translate(-50%, -100%)`;
+    world.s.style.transform=`translateX(-50%) rotate(${sec}deg)`;
+    world.m.style.transform=`translateX(-50%) rotate(${min}deg)`;
+    world.h.style.transform=`translateX(-50%) rotate(${hr}deg)`;
 }
 
 setInterval(update,1000);
 
 /* TIMER */
 let tInt;
+
 function startTimer(){
     let t=document.getElementById("minutes").value*60;
 
@@ -249,7 +255,9 @@ function startTimer(){
         t--;
         if(t<0){
             clearInterval(tInt);
-            document.getElementById("alarm").play();
+            let a=document.getElementById("alarm");
+            a.currentTime=0;
+            a.play().catch(()=>{});
         }
     },1000);
 }
@@ -261,7 +269,7 @@ function stopSound(){
 }
 
 /* STOPWATCH */
-let sw=0,run=false,int;
+let sw=0, run=false, int;
 
 function startSW(){
     if(!run){
